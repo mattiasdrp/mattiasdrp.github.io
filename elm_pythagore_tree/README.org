@@ -1,0 +1,55 @@
+:PROPERTIES:
+:TOC:      :include all :force ((nothing)) :ignore ((nothing)) :local ((nothing))
+:END:
+#+TITLE: Fractals
+#+AUTHOR: mattiasdrp
+#+DATE: [2023-02-23 jeu.]
+#+LANGUAGE: en_US
+#+PROPERTY: header-args :results silent :exports code
+#+STARTUP: hideblocks
+
+#+KEYWORDS: Pythagoras tree fractals
+
+* Introduction and remarks
+
+The following figures and demonstrations are based on coordinates starting from the upper left corner because they're the usual ones in computer sciences. This means that if we add a positive number to an x coordinate we'll go right, if we add a positive number toan y coordinate we'll go down.
+
+* Classical Pythagoras tree
+
+[[file:doc/build/figure1.pdf]]
+
+The first thing we need to compute is the distance AC:
+  - AC = AB * cos(\alpha) (because cos(\alpha) = AC/AB)
+The second thing we need to compute is \beta, [[https://en.wikipedia.org/wiki/Argument_(complex_analysis)][the argument]] (or phase) of AB
+Once we have AC and \beta, we can compute the deltas (possibly negatives, hence the fact that I don't call them "distances) between x_A and x_C and y_A and y_C:
+  - dx = AC * cos(\alpha + \beta) (classical cosinus theorem in right triangle)
+  - dy = AC * sin(\alpha + \beta) (classical sinus theorem in right triangle)
+
+With these deltas, the following equalities hold true for the first square (the red one)
+  - x_C = x_A + dx (going right from x_A by dx)
+  - y_C = y_A - dy (going up from y_A by dy)
+  - x_D = x_A - dy
+  - y_D = y_A - dx
+  - x_E = x_C - dy
+  - y_E = y_C - dx
+
+Since we were able to compute x_c and y_c, we can compute the deltas between x_b and x_c and y_b and y_c
+  - dx = x_b - x_c
+  - dy = y_b - y_c
+With these deltas we can now express the following equalities for the second square (the blue one):
+  - x_F = x_C + dx
+  - y_F = y_C - dy
+  - x_G = x_B + dx
+  - y_G = y_B - dy
+
+* Pythagoras tree with any triangle
+
+[[file:doc/build/figure2.pdf]]
+
+The only different thing we need to compute from the previous section is the distance AC.
+The issue here is that ABC is not a right triangle and we need to use the [[https://en.wikipedia.org/wiki/Solution_of_triangles][solution of the general triangle]]. We know AB, CAB = \alpha and ABC = 180 - \alpha - \gamma = \delta. In this case:
+- AC = AB * sin(\delta) / sin(\alpha + \delta)
+
+And the rest is exactly the same as in the previous section because we're handling squares.
+
+* Pythagoras tree with any triangle and any polygon

@@ -1,6 +1,7 @@
-module Pythagoras_tree exposing (..)
+module Pythagoras_tree exposing (view_pythagoras_tree)
 
 import Color
+import Html exposing (..)
 import Svg exposing (Svg)
 import TypedSvg exposing (..)
 import TypedSvg.Attributes exposing (..)
@@ -45,74 +46,75 @@ arg c1 c2 =
             (c2.x - c1.x)
 
 
-next_2_squares : Model -> Coords -> Coords -> ( Square, Square )
-next_2_squares model c1 c2 =
+next_2_squares : Float -> Float -> Coords -> Coords -> ( Square, Square )
+next_2_squares angle1 angle2 a b =
     let
+        -- Angle BAC
         alpha =
-            degrees (SingleSlider.fetchValue model.alpha)
+            degrees angle1
+
+        -- Angle ACB
+        delta =
+            degrees (180 - angle1 - angle2)
 
         beta =
-            arg c1 c2
+            arg a b
 
-        dc1c2 =
-            distance c1 c2
-
-        -- Distance between h and c1
-        hc1 =
-            dc1c2 * cos alpha ^ 2
+        ab =
+            distance a b
 
         -- Distance between a and c1
-        ac1 =
-            hc1 / cos alpha
-
-        xa =
-            c1.x + ac1 * cos (alpha + beta)
-
-        ya =
-            c1.y - ac1 * sin (alpha + beta)
+        ac =
+            ab * sin delta / sin (alpha + delta)
 
         dx1 =
-            xa - c1.x
+            ac * cos (alpha + beta)
 
         dy1 =
-            c1.y - ya
-
-        -- Since svg goes up to bottom, ya < c1.y
-        xb =
-            c1.x - dy1
-
-        yb =
-            c1.y - dx1
+            ac * sin (alpha + beta)
 
         xc =
-            xa - dy1
+            a.x + dx1
 
         yc =
-            ya - dx1
+            a.y - dy1
 
-        dx2 =
-            c2.x - xa
-
-        dy2 =
-            ya - c2.y
-
+        -- Since svg goes up to bottom, ya < c1.y
         xd =
-            xa - dy2
+            a.x - dy1
 
         yd =
-            ya - dx2
+            a.y - dx1
 
         xe =
-            c2.x - dy2
+            xc - dy1
 
         ye =
-            c2.y - dx2
+            yc - dx1
+
+        dx2 =
+            b.x - xc
+
+        dy2 =
+            b.y - yc
+
+        xf =
+            xc + dy2
+
+        yf =
+            yc - dx2
+
+        xg =
+            b.x + dy2
+
+        yg =
+            b.y - dx2
 
         square1 =
-            { c1 = { x = xb, y = yb }, c2 = { x = xc, y = yc }, c3 = { x = xa, y = ya }, c4 = c1 }
+            { c1 = { x = xd, y = yd }, c2 = { x = xe, y = ye }, c3 = { x = xc, y = yc }, c4 = a }
 
         square2 =
-            { c1 = { x = xd, y = yd }, c2 = { x = xe, y = ye }, c3 = c2, c4 = { x = xa, y = ya } }
+            { c1 = { x = xf, y = yf }, c2 = { x = xg, y = yg }, c3 = b, c4 = { x = xc, y = yc } }
     in
     ( square1, square2 )
 
@@ -135,8 +137,8 @@ edge =
 -- VIEW
 
 
-aux_generate_squares : Model -> Float -> List Square -> List Square -> List Square
-aux_generate_squares model depth squares acc =
+aux_generate_squares : Float -> Float -> Float -> List Square -> List Square -> List Square
+aux_generate_squares angle1 angle2 depth squares acc =
     if depth == 1 then
         acc
 
@@ -147,7 +149,7 @@ aux_generate_squares model depth squares acc =
                     (\square ( ttacc, nnacc ) ->
                         let
                             ( s1, s2 ) =
-                                next_2_squares model square.c1 square.c2
+                                next_2_squares angle1 angle2 square.c1 square.c2
                         in
                         ( s1 :: s2 :: ttacc
                         , s1 :: s2 :: nnacc
@@ -156,16 +158,16 @@ aux_generate_squares model depth squares acc =
                     ( [], acc )
                     squares
         in
-        aux_generate_squares model (depth - 1) tacc nacc
+        aux_generate_squares angle1 angle2 (depth - 1) tacc nacc
 
 
-generate_squares : Float -> List Square -> List Square
-generate_squares model squares =
-    aux_generate_squares model model.depth squares squares
+generate_squares : Float -> Float -> Float -> List Square -> List Square
+generate_squares angle1 angle2 depth squares =
+    aux_generate_squares angle1 angle2 depth squares squares
 
 
-view_pythagoras_tree : Float -> Html Msg
-view_pythagoras_tree val =
+view_pythagoras_tree : Float -> Float -> Float -> Html msg
+view_pythagoras_tree angle1 angle2 depth =
     let
         square =
             { c1 =
@@ -179,7 +181,7 @@ view_pythagoras_tree val =
             }
 
         squares =
-            generate_squares val [ square ]
+            generate_squares angle1 angle2 depth [ square ]
     in
     svg
         [ width (px box_size), height (px box_size) ]
