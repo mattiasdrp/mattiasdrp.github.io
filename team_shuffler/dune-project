@@ -1,0 +1,16 @@
+(lang dune 3.4)
+(name team_shuffler)
+
+(generate_opam_files true)
+
+(package
+ (name team_shuffler)
+ (synopsis "Team shuffler")
+ (description "Given a CSV file representing players, create the asked number of teams by shuffling the players")
+ (allow_empty)
+ (depends
+   ocaml
+   dune
+   bonsai)
+ (tags
+  (topics "to describe" your project)))
