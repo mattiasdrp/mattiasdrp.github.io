@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="UTF-8">
     <title>mattiasdrp github website</title>
-  </head>
-  <body>
-    <div id='app'></div>
-    <script type="text/javascript" src="hello_elm/elm.js"></script>
-    <!-- <script type="text/javascript" src="team_shuffler_elm/elm.js"></script> -->
-    <script type="text/javascript">
-      Elm.Main.fullscreen();
+    <script src="hello_elm/elm.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="w3.css">
+</head>
+
+<body>
+    <div id="elm"></div>
+    <script>
+        var app = Elm.Main.init({
+            node: document.getElementById("elm"),
+        });
     </script>
-  </body>
+</body>
+
 </html>
