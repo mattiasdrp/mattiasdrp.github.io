@@ -5242,6 +5242,9 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$Sizes = function (a) {
+	return {$: 'Sizes', a: a};
+};
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
 		fromListHelp:
@@ -5345,7 +5348,12 @@ var $author$project$Main$init_array = function (size) {
 		1,
 		A2($elm$core$Array$repeat, size, 0));
 };
-var $author$project$Main$init_size = 101;
+var $elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
 var $elm$random$Random$Seed = F2(
 	function (a, b) {
 		return {$: 'Seed', a: a, b: b};
@@ -5354,21 +5362,6 @@ var $elm$random$Random$next = function (_v0) {
 	var state0 = _v0.a;
 	var incr = _v0.b;
 	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
-};
-var $elm$random$Random$initialSeed = function (x) {
-	var _v0 = $elm$random$Random$next(
-		A2($elm$random$Random$Seed, 0, 1013904223));
-	var state1 = _v0.a;
-	var incr = _v0.b;
-	var state2 = (state1 + x) >>> 0;
-	return $elm$random$Random$next(
-		A2($elm$random$Random$Seed, state2, incr));
-};
-var $elm$random$Random$Generator = function (a) {
-	return {$: 'Generator', a: a};
-};
-var $elm$core$Basics$negate = function (n) {
-	return -n;
 };
 var $elm$core$Bitwise$xor = _Bitwise_xor;
 var $elm$random$Random$peel = function (_v0) {
@@ -5438,41 +5431,76 @@ var $elm$random$Random$list = F2(
 				return A4($elm$random$Random$listHelp, _List_Nil, n, gen, seed);
 			});
 	});
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$random$Random$step = F2(
 	function (_v0, seed) {
 		var generator = _v0.a;
 		return generator(seed);
 	});
-var $author$project$Main$init = function (iseed) {
-	var seed = $elm$random$Random$initialSeed(iseed);
-	var gen = A2(
-		$elm$random$Random$list,
-		$author$project$Main$init_size,
-		A2($elm$random$Random$int, 0, 1));
-	var base_array = $author$project$Main$init_array($author$project$Main$init_size);
-	var _v0 = A2($elm$random$Random$step, gen, seed);
-	var list = _v0.a;
+var $author$project$Main$random_array = F2(
+	function (seed, size) {
+		var gen = A2(
+			$elm$random$Random$list,
+			size,
+			A2($elm$random$Random$int, 0, 1));
+		var _v0 = A2($elm$random$Random$step, gen, seed);
+		var list = _v0.a;
+		var sseed = _v0.b;
+		return _Utils_Tuple2(
+			$elm$core$Array$fromList(list),
+			sseed);
+	});
+var $author$project$Main$gen_array = function (model) {
+	var _v0 = model.random ? A2($author$project$Main$random_array, model.seed, model.size) : _Utils_Tuple2(
+		$author$project$Main$init_array(model.size),
+		model.seed);
+	var array = _v0.a;
 	var sseed = _v0.b;
+	return _Utils_update(
+		model,
+		{array: array, prev_arrays: _List_Nil, seed: sseed});
+};
+var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
+var $elm$random$Random$initialSeed = function (x) {
+	var _v0 = $elm$random$Random$next(
+		A2($elm$random$Random$Seed, 0, 1013904223));
+	var state1 = _v0.a;
+	var incr = _v0.b;
+	var state2 = (state1 + x) >>> 0;
+	return $elm$random$Random$next(
+		A2($elm$random$Random$Seed, state2, incr));
+};
+var $author$project$Main$init = function (iseed) {
+	var size = 201;
+	var seed = $elm$random$Random$initialSeed(iseed);
+	var model = {
+		alive_color: 'black',
+		array: $elm$core$Array$empty,
+		dead_color: 'white',
+		height: 0,
+		prev_arrays: _List_Nil,
+		random: false,
+		rule: $elm$core$Array$fromList(
+			_List_fromArray(
+				[0, 1, 1, 0, 1, 1, 1, 0])),
+		seed: seed,
+		size: size,
+		square_size: 0,
+		start: false,
+		temp_alive_color: '',
+		temp_dead_color: '',
+		temp_rule: ''
+	};
+	var mmodel = $author$project$Main$gen_array(model);
 	return _Utils_Tuple2(
-		{
-			array: base_array,
-			base_array: base_array,
-			height: 0,
-			rendered_arrays: _List_Nil,
-			rule: $elm$core$Array$fromList(
-				_List_fromArray(
-					[0, 0, 0, 0, 0, 0, 0, 0])),
-			seed: seed,
-			size: $author$project$Main$init_size,
-			start: false,
-			temp_rule: ''
-		},
-		$elm$core$Platform$Cmd$none);
+		mmodel,
+		A2($elm$core$Task$perform, $author$project$Main$Sizes, $elm$browser$Browser$Dom$getViewport));
 };
 var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $author$project$Main$Tick = {$: 'Tick'};
+var $author$project$Main$Width = function (a) {
+	return {$: 'Width', a: a};
+};
+var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 'Every', a: a, b: b};
@@ -5888,99 +5916,245 @@ var $elm$time$Time$every = F2(
 		return $elm$time$Time$subscription(
 			A2($elm$time$Time$Every, interval, tagger));
 	});
-var $author$project$Main$subscriptions = function (_v0) {
-	return A2(
-		$elm$time$Time$every,
-		100,
-		function (_v1) {
-			return $author$project$Main$Tick;
-		});
-};
-var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
-var $elm$core$Array$foldl = F3(
-	function (func, baseCase, _v0) {
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = F2(
-			function (node, acc) {
-				if (node.$ === 'SubTree') {
-					var subTree = node.a;
-					return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
-				} else {
-					var values = node.a;
-					return A3($elm$core$Elm$JsArray$foldl, func, acc, values);
-				}
-			});
-		return A3(
-			$elm$core$Elm$JsArray$foldl,
-			func,
-			A3($elm$core$Elm$JsArray$foldl, helper, baseCase, tree),
-			tail);
+var $elm$browser$Browser$Events$Window = {$: 'Window'};
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$browser$Browser$Events$MySub = F3(
+	function (a, b, c) {
+		return {$: 'MySub', a: a, b: b, c: c};
 	});
-var $author$project$Main$square_size = 20;
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Main$square = function (_v0) {
-	var value = _v0.a;
-	var col = _v0.b;
-	var row = _v0.c;
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$Attributes$style,
-				'width',
-				$elm$core$String$fromInt($author$project$Main$square_size) + 'px'),
-				A2(
-				$elm$html$Html$Attributes$style,
-				'height',
-				$elm$core$String$fromInt($author$project$Main$square_size) + 'px'),
-				A2($elm$html$Html$Attributes$style, 'border', 'none'),
-				A2(
-				$elm$html$Html$Attributes$style,
-				'background-color',
-				(value === 1) ? 'black' : 'white')
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text('')
-			]));
+var $elm$browser$Browser$Events$State = F2(
+	function (subs, pids) {
+		return {pids: pids, subs: subs};
+	});
+var $elm$browser$Browser$Events$init = $elm$core$Task$succeed(
+	A2($elm$browser$Browser$Events$State, _List_Nil, $elm$core$Dict$empty));
+var $elm$browser$Browser$Events$nodeToKey = function (node) {
+	if (node.$ === 'Document') {
+		return 'd_';
+	} else {
+		return 'w_';
+	}
 };
-var $author$project$Main$rendered_array = function (model) {
-	var _v0 = A3(
-		$elm$core$Array$foldl,
+var $elm$browser$Browser$Events$addKey = function (sub) {
+	var node = sub.a;
+	var name = sub.b;
+	return _Utils_Tuple2(
+		_Utils_ap(
+			$elm$browser$Browser$Events$nodeToKey(node),
+			name),
+		sub);
+};
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
 		F2(
-			function (value, _v1) {
-				var i = _v1.a;
-				var list = _v1.b;
-				return _Utils_Tuple2(
-					i + 1,
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
+var $elm$browser$Browser$Events$Event = F2(
+	function (key, event) {
+		return {event: event, key: key};
+	});
+var $elm$browser$Browser$Events$spawn = F3(
+	function (router, key, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var actualNode = function () {
+			if (node.$ === 'Document') {
+				return _Browser_doc;
+			} else {
+				return _Browser_window;
+			}
+		}();
+		return A2(
+			$elm$core$Task$map,
+			function (value) {
+				return _Utils_Tuple2(key, value);
+			},
+			A3(
+				_Browser_on,
+				actualNode,
+				name,
+				function (event) {
+					return A2(
+						$elm$core$Platform$sendToSelf,
+						router,
+						A2($elm$browser$Browser$Events$Event, key, event));
+				}));
+	});
+var $elm$core$Dict$union = F2(
+	function (t1, t2) {
+		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
+	});
+var $elm$browser$Browser$Events$onEffects = F3(
+	function (router, subs, state) {
+		var stepRight = F3(
+			function (key, sub, _v6) {
+				var deads = _v6.a;
+				var lives = _v6.b;
+				var news = _v6.c;
+				return _Utils_Tuple3(
+					deads,
+					lives,
 					A2(
 						$elm$core$List$cons,
-						$author$project$Main$square(
-							_Utils_Tuple3(value, model.height * $author$project$Main$square_size, i * $author$project$Main$square_size)),
-						list));
-			}),
-		_Utils_Tuple2(0, _List_Nil),
-		model.array);
-	var res = _v0.b;
-	return A2(
-		$elm$html$Html$div,
+						A3($elm$browser$Browser$Events$spawn, router, key, sub),
+						news));
+			});
+		var stepLeft = F3(
+			function (_v4, pid, _v5) {
+				var deads = _v5.a;
+				var lives = _v5.b;
+				var news = _v5.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, pid, deads),
+					lives,
+					news);
+			});
+		var stepBoth = F4(
+			function (key, pid, _v2, _v3) {
+				var deads = _v3.a;
+				var lives = _v3.b;
+				var news = _v3.c;
+				return _Utils_Tuple3(
+					deads,
+					A3($elm$core$Dict$insert, key, pid, lives),
+					news);
+			});
+		var newSubs = A2($elm$core$List$map, $elm$browser$Browser$Events$addKey, subs);
+		var _v0 = A6(
+			$elm$core$Dict$merge,
+			stepLeft,
+			stepBoth,
+			stepRight,
+			state.pids,
+			$elm$core$Dict$fromList(newSubs),
+			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
+		var deadPids = _v0.a;
+		var livePids = _v0.b;
+		var makeNewPids = _v0.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (pids) {
+				return $elm$core$Task$succeed(
+					A2(
+						$elm$browser$Browser$Events$State,
+						newSubs,
+						A2(
+							$elm$core$Dict$union,
+							livePids,
+							$elm$core$Dict$fromList(pids))));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$sequence(makeNewPids);
+				},
+				$elm$core$Task$sequence(
+					A2($elm$core$List$map, $elm$core$Process$kill, deadPids))));
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$browser$Browser$Events$onSelfMsg = F3(
+	function (router, _v0, state) {
+		var key = _v0.key;
+		var event = _v0.event;
+		var toMessage = function (_v2) {
+			var subKey = _v2.a;
+			var _v3 = _v2.b;
+			var node = _v3.a;
+			var name = _v3.b;
+			var decoder = _v3.c;
+			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
+		};
+		var messages = A2($elm$core$List$filterMap, toMessage, state.subs);
+		return A2(
+			$elm$core$Task$andThen,
+			function (_v1) {
+				return $elm$core$Task$succeed(state);
+			},
+			$elm$core$Task$sequence(
+				A2(
+					$elm$core$List$map,
+					$elm$core$Platform$sendToApp(router),
+					messages)));
+	});
+var $elm$browser$Browser$Events$subMap = F2(
+	function (func, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var decoder = _v0.c;
+		return A3(
+			$elm$browser$Browser$Events$MySub,
+			node,
+			name,
+			A2($elm$json$Json$Decode$map, func, decoder));
+	});
+_Platform_effectManagers['Browser.Events'] = _Platform_createManager($elm$browser$Browser$Events$init, $elm$browser$Browser$Events$onEffects, $elm$browser$Browser$Events$onSelfMsg, 0, $elm$browser$Browser$Events$subMap);
+var $elm$browser$Browser$Events$subscription = _Platform_leaf('Browser.Events');
+var $elm$browser$Browser$Events$on = F3(
+	function (node, name, decoder) {
+		return $elm$browser$Browser$Events$subscription(
+			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
+	});
+var $elm$browser$Browser$Events$onResize = function (func) {
+	return A3(
+		$elm$browser$Browser$Events$on,
+		$elm$browser$Browser$Events$Window,
+		'resize',
+		A2(
+			$elm$json$Json$Decode$field,
+			'target',
+			A3(
+				$elm$json$Json$Decode$map2,
+				func,
+				A2($elm$json$Json$Decode$field, 'innerWidth', $elm$json$Json$Decode$int),
+				A2($elm$json$Json$Decode$field, 'innerHeight', $elm$json$Json$Decode$int))));
+};
+var $author$project$Main$subscriptions = function (_v0) {
+	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'display', 'grid'),
-				A2($elm$html$Html$Attributes$style, 'gap', '0'),
 				A2(
-				$elm$html$Html$Attributes$style,
-				'grid-template-columns',
-				'repeat(' + ($elm$core$String$fromInt(model.size) + (',' + ($elm$core$String$fromInt($author$project$Main$square_size) + 'px)'))))
-			]),
-		res);
+				$elm$time$Time$every,
+				100,
+				function (_v1) {
+					return $author$project$Main$Tick;
+				}),
+				$elm$browser$Browser$Events$onResize(
+				F2(
+					function (w, _v2) {
+						return $author$project$Main$Width(w);
+					}))
+			]));
 };
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Main$reset_model = function (model) {
+	return $author$project$Main$gen_array(model);
+};
+var $elm$core$Basics$round = _Basics_round;
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
@@ -6099,7 +6273,7 @@ var $author$project$Main$temp_rule_to_model = function (model) {
 								$icidasset$elm_binary$Binary$fromDecimal(
 									A2(
 										$elm$core$Maybe$withDefault,
-										0,
+										110,
 										$elm$core$String$toInt(model.temp_rule))))))))));
 	return _Utils_update(
 		model,
@@ -6148,6 +6322,7 @@ var $author$project$Main$aget = F3(
 				A2($elm$core$Basics$modBy, size, index),
 				array));
 	});
+var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Elm$JsArray$indexedMap = _JsArray_indexedMap;
 var $elm$core$Array$indexedMap = F2(
 	function (func, _v0) {
@@ -6224,6 +6399,13 @@ var $author$project$Main$update_array = function (model) {
 		model.array);
 	return array;
 };
+var $author$project$Main$update_square_size = F2(
+	function (model, width) {
+		var square_size = (width / model.size) | 0;
+		return _Utils_update(
+			model,
+			{square_size: square_size});
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6238,34 +6420,106 @@ var $author$project$Main$update = F2(
 				var mmodel = $author$project$Main$temp_rule_to_model(model);
 				return _Utils_Tuple2(mmodel, $elm$core$Platform$Cmd$none);
 			case 'Tick':
-				return model.start ? _Utils_Tuple2(
-					_Utils_update(
+				if (model.start) {
+					var mmodel = _Utils_update(
 						model,
 						{
 							array: $author$project$Main$update_array(model),
-							height: model.height + 1,
-							rendered_arrays: A2(
-								$elm$core$List$cons,
-								$author$project$Main$rendered_array(model),
-								model.rendered_arrays)
-						}),
-					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			default:
+							height: model.height + 1
+						});
+					return _Utils_Tuple2(
+						_Utils_update(
+							mmodel,
+							{
+								prev_arrays: A2($elm$core$List$cons, model.array, model.prev_arrays)
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			case 'Toggle':
 				return _Utils_Tuple2(
 					model.start ? _Utils_update(
 						model,
-						{array: model.base_array, rendered_arrays: _List_Nil, start: false}) : _Utils_update(
+						{start: false}) : _Utils_update(
 						model,
 						{start: true}),
 					$elm$core$Platform$Cmd$none);
+			case 'Randomize':
+				var mmodel = _Utils_update(
+					model,
+					{random: true});
+				return _Utils_Tuple2(
+					$author$project$Main$gen_array(mmodel),
+					$elm$core$Platform$Cmd$none);
+			case 'Deterministic':
+				var mmodel = _Utils_update(
+					model,
+					{random: false});
+				return _Utils_Tuple2(
+					$author$project$Main$gen_array(mmodel),
+					$elm$core$Platform$Cmd$none);
+			case 'Reset':
+				return _Utils_Tuple2(
+					$author$project$Main$reset_model(model),
+					$elm$core$Platform$Cmd$none);
+			case 'Sizes':
+				var vp = msg.a;
+				var width = $elm$core$Basics$round(vp.viewport.width);
+				return _Utils_Tuple2(
+					A2($author$project$Main$update_square_size, model, width),
+					$elm$core$Platform$Cmd$none);
+			case 'AliveColorInputChanged':
+				var s = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{temp_alive_color: s}),
+					$elm$core$Platform$Cmd$none);
+			case 'AliveColor':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{alive_color: model.temp_alive_color}),
+					$elm$core$Platform$Cmd$none);
+			case 'DeadColorInputChanged':
+				var s = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{temp_dead_color: s}),
+					$elm$core$Platform$Cmd$none);
+			case 'DeadColor':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{dead_color: model.temp_dead_color}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var width = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$update_square_size, model, width),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Main$AliveColor = {$: 'AliveColor'};
+var $author$project$Main$AliveColorInputChanged = function (a) {
+	return {$: 'AliveColorInputChanged', a: a};
+};
 var $author$project$Main$ChangedRule = {$: 'ChangedRule'};
+var $author$project$Main$DeadColor = {$: 'DeadColor'};
+var $author$project$Main$DeadColorInputChanged = function (a) {
+	return {$: 'DeadColorInputChanged', a: a};
+};
+var $author$project$Main$Deterministic = {$: 'Deterministic'};
+var $author$project$Main$Randomize = {$: 'Randomize'};
+var $author$project$Main$Reset = {$: 'Reset'};
 var $author$project$Main$RuleInputChanged = function (a) {
 	return {$: 'RuleInputChanged', a: a};
 };
 var $author$project$Main$Toggle = {$: 'Toggle'};
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
@@ -6297,7 +6551,6 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
@@ -6326,6 +6579,81 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$core$Array$foldl = F3(
+	function (func, baseCase, _v0) {
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = F2(
+			function (node, acc) {
+				if (node.$ === 'SubTree') {
+					var subTree = node.a;
+					return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
+				} else {
+					var values = node.a;
+					return A3($elm$core$Elm$JsArray$foldl, func, acc, values);
+				}
+			});
+		return A3(
+			$elm$core$Elm$JsArray$foldl,
+			func,
+			A3($elm$core$Elm$JsArray$foldl, helper, baseCase, tree),
+			tail);
+	});
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$square = F2(
+	function (value, model) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$Attributes$style,
+					'width',
+					$elm$core$String$fromInt(model.square_size) + 'px'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'height',
+					$elm$core$String$fromInt(model.square_size) + 'px'),
+					A2($elm$html$Html$Attributes$style, 'border', 'none'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'background-color',
+					(value === 1) ? model.alive_color : model.dead_color)
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('')
+				]));
+	});
+var $author$project$Main$render_array = F2(
+	function (model, array) {
+		var res = A3(
+			$elm$core$Array$foldl,
+			F2(
+				function (value, list) {
+					return A2(
+						$elm$core$List$cons,
+						A2($author$project$Main$square, value, model),
+						list);
+				}),
+			_List_Nil,
+			array);
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'display', 'grid'),
+					A2($elm$html$Html$Attributes$style, 'gap', '0'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'grid-template-columns',
+					'repeat(' + ($elm$core$String$fromInt(model.size) + (',' + ($elm$core$String$fromInt(model.square_size) + 'px)'))))
+				]),
+			res);
+	});
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$view = function (model) {
 	return A2(
@@ -6337,11 +6665,12 @@ var $author$project$Main$view = function (model) {
 				$elm$html$Html$input,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$placeholder('Rule'),
+						$elm$html$Html$Attributes$placeholder('Rule (0-255)'),
 						$elm$html$Html$Attributes$value(model.temp_rule),
 						$elm$html$Html$Events$onInput($author$project$Main$RuleInputChanged)
 					]),
 				_List_Nil),
+				$elm$html$Html$text(' '),
 				A2(
 				$elm$html$Html$button,
 				_List_fromArray(
@@ -6366,9 +6695,87 @@ var $author$project$Main$view = function (model) {
 					])),
 				$elm$html$Html$text(' '),
 				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$Main$Reset)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Reset')
+					])),
+				$elm$html$Html$text(' '),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$Main$Randomize)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Random')
+					])),
+				$elm$html$Html$text(' '),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$Main$Deterministic)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Deterministic')
+					])),
+				$elm$html$Html$text(' '),
+				A2(
+				$elm$html$Html$input,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$placeholder('Alive Colour'),
+						$elm$html$Html$Attributes$value(model.temp_alive_color),
+						$elm$html$Html$Events$onInput($author$project$Main$AliveColorInputChanged)
+					]),
+				_List_Nil),
+				$elm$html$Html$text(' '),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$Main$AliveColor)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('OK')
+					])),
+				$elm$html$Html$text(' '),
+				A2(
+				$elm$html$Html$input,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$placeholder('Dead Colour'),
+						$elm$html$Html$Attributes$value(model.temp_dead_color),
+						$elm$html$Html$Events$onInput($author$project$Main$DeadColorInputChanged)
+					]),
+				_List_Nil),
+				$elm$html$Html$text(' '),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$Main$DeadColor)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('OK')
+					])),
+				A2(
 				$elm$html$Html$div,
 				_List_Nil,
-				$elm$core$List$reverse(model.rendered_arrays))
+				A2(
+					$elm$core$List$map,
+					$author$project$Main$render_array(model),
+					$elm$core$List$reverse(
+						A2($elm$core$List$cons, model.array, model.prev_arrays))))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
